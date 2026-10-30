@@ -18,7 +18,7 @@ Aplicativo desktop para ajustar **brilho**, **temperatura de cor** e **filtros d
 | Área de notificação | Ícone na bandeja | Ao **minimizar** ou **fechar**, o app vai para a área de notificação (as duas opções podem ser desligadas no menu *Ajustes*). |
 | Iniciar com o Windows | Valor em `HKCU\…\Run` | Opcional, no instalador ou no menu *Ajustes*. Abre direto na área de notificação. |
 
-Nenhum recurso pede privilégio de administrador. O instalador também instala só para o usuário atual.
+Nenhum recurso do app pede privilégio de administrador. O instalador, por padrão, instala só para o usuário atual (sem administrador); ele também oferece instalar para todos os usuários, e nesse caso o Windows pede permissão de administrador.
 
 ### Outros sistemas (suporte secundário)
 
@@ -31,11 +31,15 @@ O menu **Ajuda › Compatibilidade desta tela** mostra o que funciona na sua má
 
 ## Instalar no Windows
 
-1. Abra a aba **Actions** do repositório e entre na execução mais recente de **Instalador Windows**.
-2. Baixe o artefato **Lume-Setup** e execute `Lume-Setup-<versão>.exe`.
-3. Em tags `v*` (por exemplo `v0.1.0`), o instalador também é anexado à página de **Releases**.
+Requisitos: Windows 10 ou 11, 64 bits.
 
-> O instalador não tem assinatura digital, então o Windows SmartScreen pode mostrar um aviso de “editor desconhecido”. Para remover o aviso é preciso assinar o executável com um certificado de assinatura de código.
+1. Abra a **[versão mais recente](https://github.com/geandreac/screen-brightness/releases/latest)**.
+2. Em **Assets**, baixe `Lume-Setup-<versão>.exe` e execute.
+3. Depois de instalado, o Lume pode se atualizar sozinho (veja [Atualizações automáticas](#atualizações-automáticas)).
+
+> **Aviso do Windows (SmartScreen):** o instalador ainda não tem assinatura digital, então o Windows pode mostrar “O Windows protegeu o computador”. Para instalar, clique em **Mais informações › Executar assim mesmo**. Para conferir que o arquivo é o original, compare o SHA‑256 (`Get-FileHash .\Lume-Setup-<versão>.exe`) com o valor exibido ao lado do arquivo na página da release.
+
+Os instaladores de cada commit também ficam disponíveis por um tempo na aba **Actions** (artefato **Lume-Setup**, exige login no GitHub). Para uso normal, prefira a página de versões.
 
 ### Gerar o instalador na sua máquina
 
