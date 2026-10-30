@@ -91,6 +91,35 @@ def test_download_rejects_truncated_file(tmp_path):
         updates.download(rel, tmp_path, opener=opener_for(PAYLOAD[:10]))
 
 
-def test_installer_command_is_silent_and_relaunches(tmp_path):
-    cmd = " ".join(updates.installer_command(tmp_path / "Lume-Setup.exe"))
-    assert "/SILENT" in cmd and "/RELAUNCH" in cmd
+def test_installer_command_is_plain_cmd_text_without_backslash_quotes():
+    from pathlib import PureWindowsPath
+
+    path = PureWindowsPath(r"C:\Users\Ana Silva\AppData\Local\Temp\lume-update\Lume-Setup-0.2.0.exe")
+    cmd = updates.installer_command(path)
+    assert isinstance(cmd, str)  # string: o Popen não reescapa as aspas
+    assert '\\"' not in cmd
+    assert cmd == (
+        'cmd.exe /d /s /c "ping -n 3 127.0.0.1 >nul & start "" '
+        f'"{path}" /SILENT /SUPPRESSMSGBOXES /NORESTART /RELAUNCH"'
+    )
+
+
+@pytest.mark.skipif(__import__("sys").platform != "win32", reason="executa o cmd.exe de verdade")
+def test_installer_command_really_launches_on_windows(tmp_path):
+    """Roda a linha de comando real com um “instalador” falso numa pasta com espaços."""
+    import subprocess
+    import time
+
+    folder = tmp_path / "pasta com espaços"
+    folder.mkdir()
+    marker = folder / "args.txt"
+    fake = folder / "Lume-Setup-9.9.9.cmd"
+    fake.write_text(f'@echo %* > "{marker}"\r\n@exit\r\n', encoding="ascii")
+    subprocess.Popen(updates.installer_command(fake), creationflags=subprocess.CREATE_NO_WINDOW)
+    deadline = time.time() + 30
+    while not marker.exists() and time.time() < deadline:
+        time.sleep(0.5)
+    assert marker.exists(), "o instalador não foi iniciado"
+    args = marker.read_text(errors="replace")
+    for flag in ("/SILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/RELAUNCH"):
+        assert flag in args

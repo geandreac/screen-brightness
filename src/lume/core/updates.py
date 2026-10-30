@@ -142,11 +142,15 @@ def download(
     return target
 
 
-def installer_command(installer: Path) -> list[str]:
-    """Instalação silenciosa (com barra de progresso) que reabre o Lume ao terminar.
+def installer_command(installer: Path) -> str:
+    """Linha de comando (texto pronto) para instalar em silêncio e reabrir o Lume.
 
     Uma pequena espera garante que o Lume já fechou (e restaurou as cores)
     antes de o instalador verificar se ele ainda está aberto.
+
+    É devolvida como *string* de propósito: passar uma lista ao ``Popen`` faz o
+    Python escapar aspas como ``\\"``, convenção que o ``cmd.exe`` não entende
+    (era o defeito da 0.1.0). Com ``/s``, o cmd remove só as aspas externas.
     """
-    args = f'"{installer}" /SILENT /SUPPRESSMSGBOXES /NORESTART /RELAUNCH'
-    return ["cmd.exe", "/c", f"ping -n 3 127.0.0.1 >nul & start \"\" {args}"]
+    inner = f'ping -n 3 127.0.0.1 >nul & start "" "{installer}" /SILENT /SUPPRESSMSGBOXES /NORESTART /RELAUNCH'
+    return f'cmd.exe /d /s /c "{inner}"'
