@@ -112,3 +112,16 @@ def test_windows_backend_refuses_other_platforms():
 
     with pytest.raises(UnsupportedError):
         windows.WindowsBackend()
+
+
+def test_windows_reset_colors_writes_linear_ramps_even_if_screen_is_adjusted():
+    """--reset-colors não pode reaplicar a curva alterada que estava na tela."""
+    from lume.core.color import linear_ramp
+
+    backend = object.__new__(windows.WindowsBackend)  # sem tocar no Windows de verdade
+    backend.originals = {r"\\.\DISPLAY1": object()}
+    adjusted = tuple([round(v * 0.5) for v in linear_ramp(256)] for _ in range(3))  # tela escurecida
+    written = []
+    backend._write_ramps = lambda make: written.append(make(adjusted))
+    backend.reset_color_to_linear()
+    assert written == [tuple(linear_ramp(256) for _ in range(3))]

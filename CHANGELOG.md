@@ -1,5 +1,14 @@
 # Registro de mudanças
 
+## 0.2.1
+
+- **Corrigido:** no Windows, `Lume.exe --reset-colors` (recuperação de emergência,
+  também usada ao desinstalar) não resetava as cores. Ele reaplicava a curva que
+  já estava na tela, mesmo alterada. Agora grava curvas neutras. No macOS, usa o
+  próprio sistema para reaplicar o perfil de cor (ColorSync).
+- Primeira versão que pode ser instalada pela atualização dentro do app
+  (a partir da 0.2.0).
+
 ## 0.2.0
 
 - **Corrigido:** “Atualizar agora” não abria o instalador no Windows. O comando

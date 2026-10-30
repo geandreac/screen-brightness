@@ -2,4 +2,4 @@
 
 APP_NAME = "Lume"
 APP_ID = "lume"
-__version__ = "0.2.0"
+__version__ = "0.2.1"

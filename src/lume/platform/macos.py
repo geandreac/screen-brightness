@@ -113,3 +113,7 @@ class MacBackend(DisplayBackend):
         with self.lock:
             for did, base in self.originals.items():
                 self._write(did, base)
+
+    def reset_color_to_linear(self) -> None:
+        """Emergência (--reset-colors): o próprio macOS reaplica o perfil ColorSync."""
+        self.cg.CGDisplayRestoreColorSyncSettings()

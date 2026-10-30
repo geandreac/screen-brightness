@@ -19,7 +19,7 @@ import threading
 from dataclasses import dataclass
 from typing import Callable
 
-from lume.core.color import Matrix3, build_ramps, sane_ramps, to_color_effect_5x5
+from lume.core.color import Matrix3, build_ramps, linear_ramp, sane_ramps, to_color_effect_5x5
 from lume.core.errors import BackendError, PermissionDeniedError, UnsupportedError
 from lume.core.models import Capabilities, DisplayInfo, FeatureStatus
 from lume.platform.base import DisplayBackend
@@ -370,6 +370,16 @@ class WindowsBackend(DisplayBackend):
         self.set_filter(None)
         if self.originals:
             self._write_ramps(lambda base: base)
+
+    def reset_color_to_linear(self) -> None:
+        """Emergência (--reset-colors): curvas neutras, sem depender do que está na tela.
+
+        ``restore_color`` não serve aqui: as “originais” são lidas da tela no
+        início, então reaplicaria uma curva que ainda estivesse alterada.
+        """
+        if not self.originals:
+            raise UnsupportedError("Ajuste de cor indisponível.")
+        self._write_ramps(lambda base: tuple(linear_ramp(len(ch)) for ch in base))
 
     def close_physical(self) -> None:
         if not self.dxva2:

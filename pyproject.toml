@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lume"
-version = "0.2.0"
+version = "0.2.1"
 description = "Ajuste de brilho, temperatura de cor e filtros opcionais da tela, com foco em conforto visual e acessibilidade."
 readme = "README.md"
 requires-python = ">=3.10"
