@@ -7,6 +7,7 @@ ROOT = Path(SPECPATH).parent
 a = Analysis(
     [str(ROOT / "packaging" / "lume_entry.py")],
     pathex=[str(ROOT / "src")],
+    datas=[(str(ROOT / "src" / "lume" / "assets" / "fonts"), "lume/assets/fonts")],
     hiddenimports=["lume.platform.windows", "lume.platform.autostart"],
     excludes=["tkinter", "PySide6.QtWebEngineCore", "PySide6.QtWebEngineWidgets", "PySide6.QtQml",
               "PySide6.QtQuick", "PySide6.Qt3DCore", "PySide6.QtMultimedia", "PySide6.QtPdf"],

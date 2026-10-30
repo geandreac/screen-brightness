@@ -202,3 +202,17 @@ def test_failed_download_shows_error_and_never_launches(make_window, qtbot):
     win.updater._start_download(win.updater.latest)
     qtbot.waitUntil(lambda: "SHA" in win.update_banner.text.text(), timeout=2000)
     assert launched == []
+
+
+def test_bundled_inter_font_loads(qapp):
+    from PySide6.QtGui import QFont, QFontInfo
+
+    from lume.ui import theme
+
+    assert (theme.FONT_DIR / "OFL.txt").exists()  # a licença precisa acompanhar a fonte
+    assert theme.ui_family() == "Inter"
+    theme.apply_font(qapp, 100)
+    semibold = QFont(qapp.font())
+    semibold.setWeight(QFont.Weight.DemiBold)
+    assert QFontInfo(qapp.font()).family() == "Inter"
+    assert QFontInfo(semibold).weight() == 600

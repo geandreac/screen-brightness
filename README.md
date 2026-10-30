@@ -113,6 +113,12 @@ QT_QPA_PLATFORM=offscreen PYTHONPATH=src .venv/bin/python -m pytest -q
 - **Transições suaves** podem ser desligadas. Ficam desligadas por padrão se o sistema pedir redução de movimento.
 - Ao **sair** (menu da bandeja › *Sair e restaurar cores*), temperatura, escurecimento e filtros voltam ao original. O brilho de hardware permanece como está, igual ao controle de brilho do sistema.
 
+## Fonte
+
+A interface usa a **[Inter](https://rsms.me/inter/)** 4.1 (pesos 400 e 600), incluída no app em `src/lume/assets/fonts/` sob a **SIL Open Font License 1.1** (texto completo em `OFL.txt`, junto dos arquivos). Assim a aparência é a mesma no Windows, no macOS e no Linux. Se a fonte não carregar, o app volta para a fonte do sistema.
+
+A SF Pro não é usada porque a licença da Apple só permite usá‑la em software para plataformas Apple, e proíbe redistribuí‑la.
+
 ## Arquitetura
 
 ```

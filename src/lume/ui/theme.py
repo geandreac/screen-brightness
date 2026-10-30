@@ -7,15 +7,22 @@ Regras compartilhadas:
 * Destaque azul só para ação principal, seleção e foco. Estados sempre têm
   texto e símbolo, nunca só cor.
 * Espaçamento em múltiplos de 4 px; raios: 6 (campos/botões), 10 (painéis).
-* Tipografia do sistema; hierarquia por tamanho e peso (400/600), sem texto
+* Tipografia: Inter (SIL OFL 1.1, distribuída com o app em assets/fonts) para
+  ter a mesma aparência em todas as plataformas; se não carregar, volta à
+  fonte do sistema. Hierarquia por tamanho e peso (400/600), sem texto
   auxiliar menor que o corpo.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 
-from PySide6.QtGui import QColor, QFontDatabase, QPalette
+from PySide6.QtGui import QColor, QFont, QFontDatabase, QPalette
+
+FONT_DIR = Path(__file__).resolve().parents[1] / "assets" / "fonts"
+FONT_FILES = ("Inter-Regular.ttf", "Inter-SemiBold.ttf")
+_ui_family: str | None = None
 
 
 @dataclass(frozen=True)
@@ -112,8 +119,27 @@ def apply_palette(app, t: Tokens) -> None:
     app.setPalette(pal)
 
 
+def ui_family() -> str | None:
+    """Registra a Inter uma única vez; devolve a família ou ``None`` (usa a do sistema)."""
+    global _ui_family
+    if _ui_family is None:
+        families: set[str] = set()
+        for name in FONT_FILES:
+            font_id = QFontDatabase.addApplicationFont(str(FONT_DIR / name))
+            if font_id >= 0:
+                families.update(QFontDatabase.applicationFontFamilies(font_id))
+        _ui_family = "Inter" if "Inter" in families else ""
+    return _ui_family or None
+
+
 def apply_font(app, scale: int) -> float:
     font = QFontDatabase.systemFont(QFontDatabase.SystemFont.GeneralFont)
+    family = ui_family()
+    if family:
+        fallback = font.family()
+        font = QFont(family)
+        font.setFamilies([family, fallback])  # glifos ausentes caem na fonte do sistema
+        font.setHintingPreference(QFont.HintingPreference.PreferNoHinting)
     size = base_point_size() * scale / 100
     font.setPointSizeF(size)
     app.setFont(font)
