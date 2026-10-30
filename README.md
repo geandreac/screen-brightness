@@ -136,6 +136,10 @@ packaging/    PyInstaller (.spec), Inno Setup (.iss), script de build no Windows
 
 Cada backend declara em `probe()` o que de fato suporta. A interface só habilita o que está disponível e explica o motivo do que não está.
 
+## Licença
+
+O código do Lume é distribuído sob a **[licença MIT](LICENSE)**. A fonte Inter, incluída no app, tem licença própria (SIL Open Font License 1.1; veja `src/lume/assets/fonts/OFL.txt`).
+
 ## Ainda não implementado
 
 - Agendamento automático por horário (os perfis são aplicados manualmente).

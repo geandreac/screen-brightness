@@ -41,6 +41,7 @@ Name: "startup"; Description: "Iniciar o Lume com o Windows (fica só o ícone n
 
 [Files]
 Source: "..\dist\Lume\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\LICENSE"; DestDir: "{app}"; DestName: "LICENSE.txt"; Flags: ignoreversion
 
 [Icons]
 Name: "{autoprograms}\Lume"; Filename: "{app}\Lume.exe"
