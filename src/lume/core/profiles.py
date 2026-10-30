@@ -28,6 +28,9 @@ class Preferences:
     close_to_tray: bool = True
     minimize_to_tray: bool = True
     tray_notice_shown: bool = False
+    auto_update: bool | None = None  # None = ainda não perguntado
+    last_update_check: float = 0.0
+    skipped_version: str = ""
 
     @classmethod
     def from_dict(cls, data: dict) -> "Preferences":
@@ -35,6 +38,12 @@ class Preferences:
         for name in ("transitions", "apply_immediately", "close_to_tray", "minimize_to_tray", "tray_notice_shown"):
             if isinstance(data.get(name), bool):
                 setattr(prefs, name, data[name])
+        if isinstance(data.get("auto_update"), bool):
+            prefs.auto_update = data["auto_update"]
+        if isinstance(data.get("last_update_check"), (int, float)):
+            prefs.last_update_check = float(data["last_update_check"])
+        if isinstance(data.get("skipped_version"), str):
+            prefs.skipped_version = data["skipped_version"][:32]
         scale = data.get("ui_scale")
         if isinstance(scale, int) and 80 <= scale <= 200:
             prefs.ui_scale = scale

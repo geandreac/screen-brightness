@@ -154,3 +154,51 @@ def test_minimize_goes_to_tray_when_available(make_window, qtbot):
         pytest.skip("sem área de notificação no ambiente de teste")
     win.showMinimized()
     qtbot.waitUntil(lambda: not win.isVisible(), timeout=2000)
+
+
+def test_update_consent_and_offer(make_window, qtbot, monkeypatch):
+    from lume.core import updates
+
+    win, _, _ = make_window()
+    upd = win.updater
+    assert win.prefs.auto_update is None and not win.act_auto_update.isChecked()
+    upd._ask_consent()
+    assert win.update_banner.isVisible() and "GitHub" in win.update_banner.text.text()
+
+    release = updates.parse_release({"tag_name": "v9.0.0", "assets": []})
+    upd._fetch = lambda: release
+    upd.set_auto(True, check_now=True)
+    assert win.act_auto_update.isChecked()
+    qtbot.waitUntil(lambda: "9.0.0" in win.update_banner.text.text(), timeout=2000)
+    # Fora do executável instalado no Windows, só oferece abrir a página: nada é baixado.
+    labels = [b.text() for b in win.update_banner.findChildren(type(win.apply_btn))]
+    assert "Abrir página da versão" in labels and "Atualizar agora" not in labels
+
+
+def test_skipped_version_is_not_offered_again(make_window, qtbot):
+    from lume.core import updates
+
+    win, _, _ = make_window()
+    win.prefs.auto_update = True
+    win.prefs.skipped_version = "9.0.0"
+    win.updater._fetch = lambda: updates.parse_release({"tag_name": "v9.0.0", "assets": []})
+    win.updater.check(manual=False)
+    qtbot.waitUntil(lambda: win.prefs.last_update_check > 0, timeout=2000)
+    assert not win.update_banner.isVisible()
+
+
+def test_failed_download_shows_error_and_never_launches(make_window, qtbot):
+    from lume.core import updates
+
+    win, _, _ = make_window()
+    launched = []
+    win.updater._launch = lambda *a, **k: launched.append(a)
+
+    def bad_download(*a, **k):
+        raise updates.UpdateError("O arquivo baixado não confere com a assinatura SHA‑256 da release.")
+
+    win.updater._download = bad_download
+    win.updater.latest = updates.parse_release({"tag_name": "v9.0.0", "assets": []})
+    win.updater._start_download(win.updater.latest)
+    qtbot.waitUntil(lambda: "SHA" in win.update_banner.text.text(), timeout=2000)
+    assert launched == []

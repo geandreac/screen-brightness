@@ -106,7 +106,12 @@ class MainWindow(QMainWindow):
         self._build_shell()
         self._build_tray()
         self._build_shortcuts()
+        from lume.ui.updater import Updater
+
+        self.updater = Updater(self, self.update_banner)
+        self.sync_update_action()
         self._start_probe()
+        self.updater.start()
 
     # ------------------------------------------------------------ estrutura
     def _build_menu(self) -> None:
@@ -149,6 +154,11 @@ class MainWindow(QMainWindow):
             self.act_autostart.setChecked(autostart.is_enabled())
             self.act_autostart.toggled.connect(self._set_autostart)
             adjust.addAction(self.act_autostart)
+        adjust.addSeparator()
+        self.act_auto_update = QAction("Verificar atualizações automaticamente", self, checkable=True)
+        self.act_auto_update.setStatusTip("Consulta as releases no GitHub uma vez por dia. Nada é instalado sem sua confirmação.")
+        self.act_auto_update.toggled.connect(lambda on: self.updater.set_auto(on, check_now=on))
+        adjust.addAction(self.act_auto_update)
 
         view = bar.addMenu("&Exibir")
         bigger = QAction("Aumentar texto", self, shortcut=QKeySequence.StandardKey.ZoomIn)
@@ -165,6 +175,9 @@ class MainWindow(QMainWindow):
         compat.triggered.connect(self.show_compatibility)
         about = QAction(f"Sobre o {APP_NAME}", self)
         about.triggered.connect(self.show_about)
+        check_now = QAction("Verificar atualizações agora", self)
+        check_now.triggered.connect(lambda: self.updater.check(manual=True))
+        help_menu.addAction(check_now)
         help_menu.addAction(compat)
         help_menu.addAction(about)
 
@@ -209,11 +222,12 @@ class MainWindow(QMainWindow):
         self.content_layout.addLayout(head)
 
         # Avisos persistentes e mensagens
+        self.update_banner = Banner()
         self.demo_banner = Banner()
         self.filter_banner = Banner()
         self.confirm_banner = Banner()
         self.message_banner = Banner()
-        for b in (self.demo_banner, self.filter_banner, self.confirm_banner, self.message_banner):
+        for b in (self.demo_banner, self.filter_banner, self.confirm_banner, self.message_banner, self.update_banner):
             self.content_layout.addWidget(b)
 
         self.loading_panel = QFrame()
@@ -950,6 +964,11 @@ class MainWindow(QMainWindow):
     def _set_transitions(self, on: bool) -> None:
         self.prefs.transitions = on
         self._save_prefs()
+
+    def sync_update_action(self) -> None:
+        self.act_auto_update.blockSignals(True)
+        self.act_auto_update.setChecked(bool(self.prefs.auto_update))
+        self.act_auto_update.blockSignals(False)
 
     def _set_pref(self, name: str, on: bool) -> None:
         setattr(self.prefs, name, on)

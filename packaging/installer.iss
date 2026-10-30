@@ -51,12 +51,20 @@ Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: 
 
 [Run]
 Filename: "{app}\Lume.exe"; Description: "Abrir o Lume agora"; Flags: nowait postinstall skipifsilent
+; Atualização feita de dentro do app (/SILENT /RELAUNCH): reabre o Lume ao terminar.
+Filename: "{app}\Lume.exe"; Flags: nowait; Check: ShouldRelaunch
 
 [UninstallRun]
 ; Garante cores originais caso o app tenha sido encerrado à força com ajustes ativos.
 Filename: "{app}\Lume.exe"; Parameters: "--reset-colors"; Flags: runhidden waituntilterminated; RunOnceId: "LumeResetColors"
 
 [Code]
+function ShouldRelaunch: Boolean;
+begin
+  { Parâmetro próprio: o Inno Setup ignora parâmetros desconhecidos. }
+  Result := WizardSilent and (Pos('/RELAUNCH', Uppercase(GetCmdTail)) > 0);
+end;
+
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
   { A opção "Iniciar com o Windows" também pode ter sido ligada dentro do app. }

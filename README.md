@@ -51,6 +51,29 @@ O resultado fica em `dist\installer\Lume-Setup-<versão>.exe`. Para gerar só o 
 pyinstaller packaging\lume.spec --noconfirm
 ```
 
+## Atualizações automáticas
+
+- **Só com autorização.** Na primeira execução, um aviso pergunta se o Lume pode verificar novas versões uma vez por dia. A opção pode ser mudada a qualquer momento em **Ajustes › Verificar atualizações automaticamente**, e há também **Ajuda › Verificar atualizações agora**.
+- A verificação consulta apenas a API pública de releases do GitHub. Nenhum dado pessoal é enviado.
+- Quando há versão nova, aparece um aviso com **Atualizar agora**, **Ver novidades**, **Depois** e **Pular esta versão**. Nada é baixado sem clique.
+- **Atualizar agora** (só no app instalado no Windows) pede confirmação e baixa o `Lume-Setup-<versão>.exe` da release. Antes de executar, o app confere o tamanho e o **SHA‑256** informado pelo GitHub. Depois fecha (restaurando as cores), instala em modo silencioso e reabre o app. Perfis e preferências são mantidos.
+- Rodando a partir do código ou fora do Windows, o aviso apenas abre a página da release.
+
+### Publicar uma nova versão
+
+1. Atualize a versão em `src/lume/__init__.py` (`__version__`) e em `pyproject.toml`.
+2. Faça commit e crie a tag correspondente:
+
+```bash
+git tag v0.2.0
+```
+
+```bash
+git push origin main v0.2.0
+```
+
+3. O workflow gera o instalador e cria a release com o `Lume-Setup-0.2.0.exe` anexado. A partir daí, os apps instalados com a verificação ligada passam a oferecer a atualização.
+
 ## Rodar a partir do código
 
 ```bash
@@ -107,5 +130,5 @@ Cada backend declara em `probe()` o que de fato suporta. A interface só habilit
 
 - Agendamento automático por horário (os perfis são aplicados manualmente).
 - Atalhos de teclado globais (fora da janela).
-- Assinatura digital do instalador.
+- Assinatura digital do instalador (a integridade do download é conferida por SHA‑256, mas o Windows SmartScreen ainda mostra “editor desconhecido”).
 - Controle de brilho de hardware no macOS e filtros de tela inteira no Linux/macOS (não há API pública).
