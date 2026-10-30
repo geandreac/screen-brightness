@@ -110,9 +110,9 @@ def test_installer_command_really_launches_on_windows(tmp_path):
     import subprocess
     import time
 
-    folder = tmp_path / "pasta com espaços"
+    folder = tmp_path / "pasta com espaços e acentuação"  # como “C:\Users\João Silva”
     folder.mkdir()
-    marker = folder / "args.txt"
+    marker = tmp_path / "args.txt"  # o .cmd é gravado em ASCII, então o marcador fica fora da pasta acentuada
     fake = folder / "Lume-Setup-9.9.9.cmd"
     fake.write_text(f'@echo %* > "{marker}"\r\n@exit\r\n', encoding="ascii")
     subprocess.Popen(updates.installer_command(fake), creationflags=subprocess.CREATE_NO_WINDOW)
